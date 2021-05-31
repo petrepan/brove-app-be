@@ -1,37 +1,40 @@
 const mongoose = require("mongoose");
 
-const loanSchema = mongoose.Schema(
- {
+const loanSchema = mongoose.Schema({
   user: {
-   type: mongoose.Schema.Types.ObjectId,
-   required: true,
-   ref: "User",
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
   },
   amount: {
-   type: Number,
-   required: true,
+    type: Number,
+    required: true,
   },
   balance: {
-   type: Number,
+    type: Number,
   },
   percentage: {
-   type: Number,
-   required: true,
+    type: Number,
+    required: true,
   },
   duration: {
-   type: String,
-   required: true,
+    type: String,
+    required: true,
   },
   active: {
-   type: Boolean,
-   default: false,
-   required: true,
+    type: Boolean,
+    default: false,
+    required: true,
   },
- },
- {
-  timestamps: true,
- }
-);
+  appliedDate: {
+    type: String,
+    required: true,
+  },
+  paybackDate: {
+    type: String,
+    required: true,
+  },
+});
 
 const Loan = mongoose.model("Loan", loanSchema);
 

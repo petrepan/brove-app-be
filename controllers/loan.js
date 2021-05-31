@@ -21,7 +21,8 @@ const getLoan = async (req, res) => {
           duration: loanDetails.duration,
           active: loanDetails.active,
           portfolioValue,
-          date: loanDetails.updatedAt,
+          appliedDate: loanDetails.appliedDate,
+          paybackDate: loanDetails.paybackDate,
         },
       });
     } else {
@@ -51,9 +52,9 @@ const getLoan = async (req, res) => {
 };
 
 const applyForLoan = async (req, res) => {
-  const { amount, percentage, duration } = req.body;
+  const { amount, percentage, duration, appliedDate, paybackDate } = req.body;
 
-  if (!amount || !percentage || !duration) {
+  if (!amount || !percentage || !duration || !appliedDate || !paybackDate) {
     return res.status(400).send({
       message: "All fields are required",
       status: "failed",
@@ -76,6 +77,8 @@ const applyForLoan = async (req, res) => {
         loan.percentage = percentage;
         loan.duration = duration;
         loan.active = true;
+        loan.appliedDate = appliedDate;
+        loan.paybackDate = paybackDate;
 
         await loan.save();
 
@@ -117,8 +120,10 @@ const payBackLoan = async (req, res) => {
         loan.amount = 0;
         loan.balance = 0;
         loan.percentage = 0;
-        loan.duration = "None";
+        loan.duration = "none";
         loan.active = false;
+        loan.appliedDate = "none";
+        loan.paybackDate = "none";
 
         await loan.save();
 
@@ -132,6 +137,8 @@ const payBackLoan = async (req, res) => {
         loan.percentage = loan.percentage;
         loan.duration = loan.duration;
         loan.active = true;
+        loan.paybackDate = loan.paybackDate;
+        loan.appliedDate = loan.appliedDate;
 
         await loan.save();
         return res.status(201).send({
