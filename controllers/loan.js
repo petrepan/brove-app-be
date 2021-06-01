@@ -19,6 +19,7 @@ const getLoan = async (req, res) => {
           amount: loanDetails.amount,
           balance: loanDetails.balance,
           duration: loanDetails.duration,
+          percentage: loanDetails.percentage,
           active: loanDetails.active,
           portfolioValue,
           appliedDate: loanDetails.appliedDate,
