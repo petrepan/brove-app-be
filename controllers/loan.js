@@ -16,7 +16,7 @@ const getLoanDetails = async (req, res) => {
       return res.status(200).send({
         status: "success",
         data: {
-          user: loanDetails.user,
+          email: user.email,
           amount: loanDetails.amount,
           paybackAmount: loanDetails.paybackAmount,
           balance: loanDetails.balance,
