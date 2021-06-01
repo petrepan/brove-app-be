@@ -158,7 +158,7 @@ const paybackLoan = async (req, res) => {
       } else {
         loan.amount = loan.amount;
         loan.paybackAmount = loan.paybackAmount;
-        loan.balance = loan.paybackAmount - Number(amount);
+        loan.balance = loan.balance - Number(amount);
         loan.percentage = loan.percentage;
         loan.duration = loan.duration;
         loan.active = true;
