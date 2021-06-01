@@ -17,7 +17,7 @@ const auth = async (req, res, next) => {
    // if everything is good, save user detail to request for use in other routes
    req.user = await User.findById(decoded.id).select("-password");
 
-   next();
+   next(); 
   } catch (error) {
    return res
     .status(401)

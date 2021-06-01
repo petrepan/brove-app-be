@@ -23,7 +23,7 @@ const paymentSchema = mongoose.Schema(
       required: true,
     },
     paidAt: {
-      type: Date,
+      type: String,
       required: true,
     },
   },

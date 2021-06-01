@@ -30,11 +30,11 @@ const loanSchema = mongoose.Schema({
     required: true,
   },
   appliedDate: {
-    type: Date,
+    type: String,
     required: true,
   },
   paybackDate: {
-    type: Date,
+    type: String,
     required: true,
   },
 });

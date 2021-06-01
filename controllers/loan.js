@@ -111,7 +111,7 @@ const applyForLoan = async (req, res) => {
 const paybackLoan = async (req, res) => {
   const { amount, paidAt } = req.body;
 
-  if (!amount) {
+  if (!amount || !paidAt) {
     return res.status(400).send({
       message: "All fields are required",
       status: "failed",
@@ -123,7 +123,7 @@ const paybackLoan = async (req, res) => {
 
     if (loan.active) {
       const payment = new Payment({
-        user: req.user._id,
+        user: req.user._id, 
         loan: {
           appliedDate: loan.appliedDate,
           paybackDate: loan.paybackDate,
@@ -175,7 +175,9 @@ const paybackLoan = async (req, res) => {
         message: "You have no Active Loan.",
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
 };
 
 module.exports = { getLoanDetails, applyForLoan, paybackLoan };
