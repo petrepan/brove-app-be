@@ -1,9 +1,10 @@
 const User = require("../models/User");
 const Portfolio = require("../models/Portfolio");
 const Loan = require("../models/Loan");
+const Payment = require("../models/Payment");
 const portfolios = require("../data/index");
 
-const getLoan = async (req, res) => {
+const getLoanDetails = async (req, res) => {
   try {
     const loanDetails = await Loan.findOne({ user: req.user._id });
     const user = await User.findById(req.user._id);
@@ -17,6 +18,7 @@ const getLoan = async (req, res) => {
         data: {
           user: loanDetails.user,
           amount: loanDetails.amount,
+          paybackAmount: loanDetails.paybackAmount,
           balance: loanDetails.balance,
           duration: loanDetails.duration,
           percentage: loanDetails.percentage,
@@ -63,6 +65,8 @@ const applyForLoan = async (req, res) => {
     });
   }
 
+  let paybackAmount = (amount * percentage).toFixed(0);
+
   try {
     const loan = await Loan.findOne({ user: req.user._id });
     const user = await User.findById(req.user._id);
@@ -74,7 +78,8 @@ const applyForLoan = async (req, res) => {
     if (loan.active === false) {
       if (portfolioValue >= 10000) {
         loan.amount = amount;
-        loan.balance = amount;
+        loan.paybackAmount = paybackAmount;
+        loan.balance = paybackAmount;
         loan.percentage = percentage;
         loan.duration = duration;
         loan.active = true;
@@ -103,8 +108,8 @@ const applyForLoan = async (req, res) => {
   } catch (error) {}
 };
 
-const payBackLoan = async (req, res) => {
-  const { amount } = req.body;
+const paybackLoan = async (req, res) => {
+  const { amount, paidAt } = req.body;
 
   if (!amount) {
     return res.status(400).send({
@@ -117,8 +122,24 @@ const payBackLoan = async (req, res) => {
     const loan = await Loan.findOne({ user: req.user._id });
 
     if (loan.active) {
-      if (amount === loan.amount) {
+      const payment = new Payment({
+        user: req.user._id,
+        loan: {
+          appliedDate: loan.appliedDate,
+          paybackDate: loan.paybackDate,
+          duration: loan.duration,
+          paybackAmount: loan.paybackAmount,
+        },
+        amount,
+        completed: amount === loan.paybackAmount,
+        paidAt,
+      });
+
+      await payment.save();
+
+      if (amount === loan.paybackAmount) {
         loan.amount = 0;
+        loan.paybackAmount = 0;
         loan.balance = 0;
         loan.percentage = 0;
         loan.duration = "none";
@@ -134,7 +155,8 @@ const payBackLoan = async (req, res) => {
         });
       } else {
         loan.amount = loan.amount;
-        loan.balance = loan.amount - Number(amount);
+        loan.paybackAmount = loan.paybackAmount;
+        loan.balance = loan.paybackAmount - Number(amount);
         loan.percentage = loan.percentage;
         loan.duration = loan.duration;
         loan.active = true;
@@ -156,4 +178,4 @@ const payBackLoan = async (req, res) => {
   } catch (error) {}
 };
 
-module.exports = { getLoan, applyForLoan, payBackLoan };
+module.exports = { getLoanDetails, applyForLoan, paybackLoan };

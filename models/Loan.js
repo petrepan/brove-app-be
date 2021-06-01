@@ -10,6 +10,9 @@ const loanSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+  paybackAmount: {
+    type: Number,
+  },
   balance: {
     type: Number,
   },
@@ -27,11 +30,11 @@ const loanSchema = mongoose.Schema({
     required: true,
   },
   appliedDate: {
-    type: String,
+    type: Date,
     required: true,
   },
   paybackDate: {
-    type: String,
+    type: Date,
     required: true,
   },
 });

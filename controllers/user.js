@@ -66,6 +66,7 @@ const register = async (req, res) => {
       amount: 0,
       balance: 0,
       percentage: 0,
+      paybackAmount: 0,
       duration: "none",
       active: false,
       appliedDate: "none",

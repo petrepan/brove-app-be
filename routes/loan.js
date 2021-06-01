@@ -1,9 +1,9 @@
 const router = require("express").Router();
-const { getLoan, applyForLoan, payBackLoan } = require("../controllers/loan");
+const { getLoanDetails, applyForLoan, paybackLoan } = require("../controllers/loan");
 const auth = require("../middlewares/auth");
 
-router.get("/get-user-loan", auth, getLoan);
+router.get("/get-user-loan", auth, getLoanDetails);
 router.post("/apply-for-loan", auth, applyForLoan);
-router.put("/payback-loan", auth, payBackLoan);
+router.put("/payback-loan", auth, paybackLoan);
 
 module.exports = router;
