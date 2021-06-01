@@ -50,7 +50,7 @@ const getLoanDetails = async (req, res) => {
       }
     }
   } catch (error) {
-    console.log(error.message);
+    return res.status(500).send(error.message);
   }
 };
 
@@ -105,7 +105,9 @@ const applyForLoan = async (req, res) => {
           "You have an Active Loan Already. Payback the loan to be eligible",
       });
     }
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
 };
 
 const paybackLoan = async (req, res) => {
@@ -176,7 +178,7 @@ const paybackLoan = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error)
+    return res.status(500).send(error.message);
   }
 };
 

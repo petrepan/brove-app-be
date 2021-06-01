@@ -8,8 +8,8 @@ const paymentSchema = mongoose.Schema(
       ref: "User",
     },
     loan: {
-      appliedDate: { type: Date },
-      paybackDate: { type: Date },
+      appliedDate: { type: String },
+      paybackDate: { type: String },
       duration: { type: String },
       paybackAmount: { type: Number },
     },
