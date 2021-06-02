@@ -1,9 +1,10 @@
 const router = require("express").Router();
 const {
- register,
- login,
- singleUser,
- updateUser,
+  register,
+  login,
+  singleUser,
+  updateUserProfile,
+  updateUserPassword,
 } = require("../controllers/user");
 const auth = require("../middlewares/auth");
 
@@ -17,7 +18,8 @@ router.post("/login", login);
 router.get("/", auth, singleUser);
 
 //update user information route
-router.put("/update", auth, updateUser);
+router.put("/update/profile", auth, updateUserProfile);
+router.put("/update/password", auth, updateUserPassword);
 
 //get all users route
 // Added auth middleware to make sure only an authenticated user can access this route

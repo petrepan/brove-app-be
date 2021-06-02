@@ -183,8 +183,8 @@ const singleUser = async (req, res) => {
 };
 
 //update user information
-const updateUser = async (req, res) => {
-  const { name, email, oldPassword, newPassword } = req.body;
+const updateUserProfile = async (req, res) => {
+  const { name, email } = req.body;
 
   //check if email field is valid
   if (!validateEmail(email)) {
@@ -198,32 +198,9 @@ const updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
-    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
-
-    if (!passwordMatch) {
-      return res.status(400).send({
-        message: "Previous password doesn't match",
-        status: "failed",
-        data: null,
-      });
-    }
-
-     if (newPassword.length < 5) {
-       return res.status(400).send({
-         message: "New Password must be more than 4 characters",
-         status: "failed",
-         data: null,
-       });
-     }
-
-    const salt = await bcrypt.genSalt(10);
-
-    const hashPassword = await bcrypt.hash(newPassword || user.password, salt);
-
     if (user) {
       user.name = name || user.name;
       user.email = email || user.email;
-      user.password = hashPassword || user.password;
 
       const updatedUser = await user.save();
 
@@ -241,8 +218,66 @@ const updateUser = async (req, res) => {
         .send({ message: "User not found", status: "failed", data: null });
     }
   } catch (error) {
+    console.log(error);
     return res.status(500).send(error.message);
   }
 };
 
-module.exports = { register, login, updateUser, singleUser };
+const updateUserPassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findById(req.user._id);
+
+    const passwordMatch = await bcrypt.compare(
+      oldPassword || user.password,
+      user.password
+    );
+
+    if (!passwordMatch) {
+      return res.status(400).send({
+        message: "Previous password doesn't match",
+        status: "failed",
+        data: null,
+      });
+    }
+
+    if (newPassword.length < 5) {
+      return res.status(400).send({
+        message: "New Password must be more than 4 characters",
+        status: "failed",
+        data: null,
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+
+    const hashPassword = await bcrypt.hash(newPassword || user.password, salt);
+
+    if (user) {
+      user.password = hashPassword || user.password;
+
+      const updatedUser = await user.save();
+
+      return res.status(200).send({
+        status: "success",
+        message: "Passworld successfully updated",
+      });
+    } else {
+      return res
+        .status(400)
+        .send({ message: "User not found", status: "failed", data: null });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error.message);
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  updateUserProfile,
+  singleUser,
+  updateUserPassword,
+};
