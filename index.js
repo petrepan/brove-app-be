@@ -10,10 +10,13 @@ const app = express();
 
 connectDB();
 
-//Built-in Middleware
+/*Built-in Middleware */
+//parse json request body
 app.use(express.json());
+//parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
 
+//enable cors
 const corsOptions = {
   origin: "http://localhost:3000",
   credentials: true, //access-control-allow-credentials:true
@@ -21,6 +24,7 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+//set routes
 app.use("/api/users", user);
 app.use("/api/portfolios", portfolio);
 app.use("/api/loans", loan);

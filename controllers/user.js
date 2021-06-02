@@ -135,13 +135,11 @@ const login = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return res
-        .status(400)
-        .send({
-          message: "Invalid Credentials!",
-          status: "failed",
-          data: null,
-        });
+      return res.status(400).send({
+        message: "Invalid Credentials!",
+        status: "failed",
+        data: null,
+      });
     }
 
     return res.status(200).send({
@@ -186,14 +184,41 @@ const singleUser = async (req, res) => {
 
 //update user information
 const updateUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, oldPassword, newPassword } = req.body;
+
+  //check if email field is valid
+  if (!validateEmail(email)) {
+    return res.status(400).send({
+      message: "Email field is not valid",
+      status: "failed",
+      data: null,
+    });
+  }
 
   try {
     const user = await User.findById(req.user._id);
 
+    const passwordMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!passwordMatch) {
+      return res.status(400).send({
+        message: "Previous password doesn't match",
+        status: "failed",
+        data: null,
+      });
+    }
+
+     if (newPassword.length < 5) {
+       return res.status(400).send({
+         message: "New Password must be more than 4 characters",
+         status: "failed",
+         data: null,
+       });
+     }
+
     const salt = await bcrypt.genSalt(10);
 
-    const hashPassword = await bcrypt.hash(password || user.password, salt);
+    const hashPassword = await bcrypt.hash(newPassword || user.password, salt);
 
     if (user) {
       user.name = name || user.name;
@@ -219,19 +244,5 @@ const updateUser = async (req, res) => {
     return res.status(500).send(error.message);
   }
 };
-
-//get all users route
-// const getAllUsers = async (req, res) => {
-//  try {
-//   const users = await User.find({}).select("-password");
-//   res.json({
-//    message: "Get all users",
-//    status: "success",
-//    data: users,
-//   });
-//  } catch (error) {
-//   return res.status(500).json(error.message);
-//  }
-// };
 
 module.exports = { register, login, updateUser, singleUser };
