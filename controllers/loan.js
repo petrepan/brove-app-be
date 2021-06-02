@@ -133,13 +133,13 @@ const paybackLoan = async (req, res) => {
           paybackAmount: loan.paybackAmount,
         },
         amount,
-        completed: amount === loan.paybackAmount,
+        completed: amount === loan.balance,
         paidAt,
       });
 
       await payment.save();
 
-      if (amount === loan.paybackAmount) {
+      if (amount === loan.balance) {
         loan.amount = 0;
         loan.paybackAmount = 0;
         loan.balance = 0;
