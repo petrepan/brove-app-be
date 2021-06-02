@@ -206,6 +206,7 @@ const updateUserProfile = async (req, res) => {
 
       return res.status(200).send({
         status: "success",
+        message: "Profile updated successfully",
         data: {
           id: updatedUser._id,
           name: updatedUser.name,
@@ -261,7 +262,7 @@ const updateUserPassword = async (req, res) => {
 
       return res.status(200).send({
         status: "success",
-        message: "Passworld successfully updated",
+        message: "Password successfully updated",
       });
     } else {
       return res
