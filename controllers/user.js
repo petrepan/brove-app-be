@@ -198,6 +198,14 @@ const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
+    const userExists = await User.findOne({ email });
+
+    if (userExists && email !== user.email) {
+      return res
+        .status(400)
+        .send({ message: "Email already taken", status: "failed", data: null });
+    }
+
     if (user) {
       user.name = name || user.name;
       user.email = email || user.email;
