@@ -162,6 +162,7 @@ const singleUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     const loanDetails = await Loan.findOne({ user: req.user._id });
+    const userPortfolio = await Portfolio.find({ user: req.user._id });
 
     user.totalPortfolioValue(portfolios);
 
@@ -173,6 +174,7 @@ const singleUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        userPortfolio,
         portfolioValue,
         loanDetails,
       },
