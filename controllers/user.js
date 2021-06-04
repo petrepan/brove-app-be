@@ -69,6 +69,8 @@ const register = async (req, res) => {
       paybackAmount: 0,
       duration: "none",
       active: false,
+      appliedDate: "none",
+      paybackDate: "none",
     };
 
     await Loan.create(loanDetails);
