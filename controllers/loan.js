@@ -1,3 +1,4 @@
+const axios = require("axios");
 const User = require("../models/User");
 const Portfolio = require("../models/Portfolio");
 const Loan = require("../models/Loan");
@@ -59,11 +60,65 @@ const getLoanDetails = async (req, res) => {
   }
 };
 
+//@desc   processing payment with paystack api
+const paystack = async (accountNumber, bankCode, amount) => {
+  try {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+      },
+    };
+
+    const res = await axios.get(
+      `https://api.paystack.co/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`,
+      config
+    );
+
+    const data = res.data;
+
+    const recipient = await axios.post(
+      "https://api.paystack.co/transferrecipient",
+      {
+        account_number: data.data.account_number,
+        type: "nuban",
+        bank_code: bankCode,
+        currency: "NGN",
+      },
+      config
+    );
+
+    const data2 = recipient.data;
+
+    const transfer = await axios.post(
+      "https://api.paystack.co/transfer",
+      {
+        recipient: data2.data.recipient_code,
+        source: "balance",
+        amount: amount * 100 * 450,
+        currency: "NGN",
+      },
+      config
+    );
+
+    transfer.data;
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+};
+
 // @desc    Apply for a loan
 // @route   POST /api/loans/apply-for-loan
 // @access  Private
 const applyForLoan = async (req, res) => {
-  const { amount, percentage, duration, appliedDate, paybackDate } = req.body;
+  const {
+    amount,
+    percentage,
+    duration,
+    appliedDate,
+    paybackDate,
+    bankCode,
+    accountNumber,
+  } = req.body;
 
   if (!amount || !percentage || !duration || !appliedDate || !paybackDate) {
     return res.status(400).send({
@@ -101,6 +156,8 @@ const applyForLoan = async (req, res) => {
         loan.paybackDate = paybackDate;
 
         await loan.save();
+
+        paystack(accountNumber, bankCode, amount);
 
         return res.status(201).send({
           status: "success",
