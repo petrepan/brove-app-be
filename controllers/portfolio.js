@@ -1,6 +1,8 @@
 const Portfolio = require("../models/Portfolio");
 
-//get a user portfolio
+// @desc    Get a User's Portfolio
+// @route   GET /api/portfolios/get-user-portfolio
+// @access  Private
 const getUserPortfolio = async (req, res) => {
  try {
   const userPortfolio = await Portfolio.find({ user: req.user._id });

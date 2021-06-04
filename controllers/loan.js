@@ -4,6 +4,9 @@ const Loan = require("../models/Loan");
 const Payment = require("../models/Payment");
 const portfolios = require("../data/index");
 
+// @desc    Get a User's Loan Informations
+// @route   GET /api/loans/get-user-loan
+// @access  Private
 const getLoanDetails = async (req, res) => {
   try {
     const loanDetails = await Loan.findOne({ user: req.user._id });
@@ -12,6 +15,7 @@ const getLoanDetails = async (req, res) => {
 
     let portfolioValue = user.portfolioValue;
 
+    //check if there's an active loan, then return the data
     if (loanDetails.active) {
       return res.status(200).send({
         status: "success",
@@ -29,6 +33,7 @@ const getLoanDetails = async (req, res) => {
         },
       });
     } else {
+      //@desc    if there's no active loan, check if the user is eligible or not
       if (portfolioValue >= 10000) {
         return res.status(200).send({
           status: "success",
@@ -54,6 +59,9 @@ const getLoanDetails = async (req, res) => {
   }
 };
 
+// @desc    Apply for a loan
+// @route   POST /api/loans/apply-for-loan
+// @access  Private
 const applyForLoan = async (req, res) => {
   const { amount, percentage, duration, appliedDate, paybackDate } = req.body;
 
@@ -65,17 +73,23 @@ const applyForLoan = async (req, res) => {
     });
   }
 
+  //calculate total amount to payback using percentage and amount
   let paybackAmount = (amount * percentage).toFixed(0);
 
   try {
     const loan = await Loan.findOne({ user: req.user._id });
     const user = await User.findById(req.user._id);
 
+    //calculate total portfolio value
     user.totalPortfolioValue(portfolios);
 
     let portfolioValue = user.portfolioValue;
 
+    //check if a user has an active loan
     if (loan.active === false) {
+      /*if there's no active loan, check if they are eligible for a loan. 
+     Activate a loan if they are eligible and return an error status code if they are not
+      */
       if (portfolioValue >= 10000) {
         loan.amount = amount;
         loan.paybackAmount = paybackAmount;
@@ -110,6 +124,9 @@ const applyForLoan = async (req, res) => {
   }
 };
 
+// @desc    Payback a loan
+// @route   POST /api/loans/payback-loan
+// @access  Private
 const paybackLoan = async (req, res) => {
   const { amount, paidAt } = req.body;
 
@@ -123,9 +140,10 @@ const paybackLoan = async (req, res) => {
   try {
     const loan = await Loan.findOne({ user: req.user._id });
 
+    //check if a user has an active loan to payback
     if (loan.active) {
       const payment = new Payment({
-        user: req.user._id, 
+        user: req.user._id,
         loan: {
           appliedDate: loan.appliedDate,
           paybackDate: loan.paybackDate,
@@ -139,6 +157,7 @@ const paybackLoan = async (req, res) => {
 
       await payment.save();
 
+      //check if a user is paying back fully or part of the loan
       if (amount === loan.balance) {
         loan.amount = 0;
         loan.paybackAmount = 0;
